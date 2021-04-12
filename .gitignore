@@ -136,3 +136,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Various artifacts that we don't need in the repo
+*.class
+*.jar
+*.log
+*.pdf
+*.zip
