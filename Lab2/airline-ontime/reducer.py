@@ -22,7 +22,7 @@ def _print_stats(key, stats):
 
 
 cur_key = None
-stats = {}
+stats = collections.defaultdict(float)
 
 for ln in sys.stdin:
     (key, val) = ln.strip().split('\t', 2)
