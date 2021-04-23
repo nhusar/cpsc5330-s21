@@ -1,0 +1,78 @@
+CPSC5330 -- Spring 2021
+Lab 3
+
+================================================
+1. Hive for On-Time Airline Tracking
+
+Do some airlines have better average on-time performance than others?
+You and Hive will find out!
+Your ultimate goal is a table of this form:
+
++--------------------------+--------------------
+| Airline                  | AvgArrDelayMinutes
++--------------------------+--------------------
+| Spirit Air Lines         | 18.634635101127785 |
+| JetBlue Airways          | 17.283021432779012 |
+| Virgin America           | 15.657723265619012 |
+
+etc.
+
+(This table is to indicate content;  you don't need to match formatting or column names.)
+
+You will do this by
+
+  -- exporting tables from the Airlines database that contain airline name information and delay information, 
+      and put them in Hive
+  -- use a Hive query to produce the tabular results
+
+Note:  in the database, the entry for Spirit Air Lines is actually 'Spirit Air Lines: NK'  and it's up to 
+you how to get rid of the ': NK' part.  You can do processing of the Airline Name field in an additional 
+Hadoop job, or figure out how to do it in Hive.
+
+For this question all of your code and your output will be "inline" in the document you will hand in.
+
+==================================================================
+2. Text Processing / TFIDF
+
+Over the course of the quarter we will be building a simple search engine where the 
+document ingestion / indexing phase will be done using Hadoop/Spark.   Relevance is 
+based on the concept of "TFIDF" which is explained in the document in the Lab3 directory.
+
+For this question you are going to hand in your code in a single .tar file.  It must be named tfidf.tar, and
+it must have these entries:
+
+root@dd36c00708b3:/# tar tf tfidf.tar
+tfidf/
+tfidf/step-4-tfidf
+tfidf/hadoop-streaming
+tfidf/4-df/
+tfidf/4-df/reducer.py
+tfidf/4-df/mapper.py
+tfidf/step-5-tfidf-hive
+tfidf/step-1-term-count
+tfidf/step-2-terms-per-doc
+tfidf/2-term-count-document/
+tfidf/2-term-count-document/reducer.py
+tfidf/2-term-count-document/mapper.py
+tfidf/3-split-key/
+tfidf/3-split-key/reducer.py
+tfidf/3-split-key/mapper.py
+tfidf/step-3-split-doc-term
+tfidf/1-term-count/
+tfidf/1-term-count/reducer.py
+tfidf/1-term-count/mapper.py
+
+In addition, in the submitted document, show queries that identify the five term/document pairs that have 
+the highest and the lowest TFIDF.
+
+==========================================
+TO HAND IN
+	
+(1) A single PDF file with
+  (a) Your name
+  (b) How much time did you spend on the lab
+  (c) What were the challenging / difficult parts of the lab
+  (d) Your code and output from question 1
+  (e) Your queries and output from question 2
+(3) The TAR file with your code for question 2
+

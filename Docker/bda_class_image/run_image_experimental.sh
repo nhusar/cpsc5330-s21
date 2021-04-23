@@ -1,0 +1,1 @@
+docker run -it -v /mnt/c/Users/hanks/Documents/GitHub/cpsc5330-s21/SCRATCH:/code hanksseattleu/bda_class_image:experimental bash
