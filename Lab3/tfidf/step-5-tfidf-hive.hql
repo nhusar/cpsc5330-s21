@@ -1,10 +1,12 @@
 
+DROP TABLE IF EXISTS doc_size;
 CREATE EXTERNAL TABLE IF NOT EXISTS doc_size (
     doc_id string,
     term_count int)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE LOCATION '/data-output/2-term-count-document';
 
+DROP TABLE IF EXISTS doc_term_count;
 CREATE EXTERNAL TABLE IF NOT EXISTS doc_term_count (
     doc_id string,
     term string,
@@ -12,6 +14,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS doc_term_count (
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE LOCATION '/data-output/3-split-doc-term';
 
+DROP TABLE IF EXISTS term_docs;
 CREATE EXTERNAL TABLE IF NOT EXISTS term_docs (
     term string,
     doc_count int)
