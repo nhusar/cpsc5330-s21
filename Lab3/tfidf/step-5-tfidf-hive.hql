@@ -26,10 +26,16 @@ CREATE TABLE tfidf
 ROW FORMAT DELIMITED FIELDS TERMINATED by '\t'
 STORED AS TEXTFILE LOCATION '/data-output/tfidf'
 AS SELECT
-    doc_term_count.doc_id,
-    doc_term_count.term,
+    doc_term_count.doc_id AS doc_id,
+    doc_term_count.term AS term,
     1000000 * (doc_term_count.term_count / doc_size.term_count) / term_docs.doc_count AS tfidf
 FROM doc_term_count
 JOIN doc_size ON (doc_size.doc_id = doc_term_count.doc_id)
 JOIN term_docs ON (term_docs.term = doc_term_count.term)
 ORDER BY tfidf DESC;
+
+-- Top 5 TF-IDF document-term pairs:
+SELECT doc_id, term, tfidf FROM tfidf ORDER BY tfidf DESC LIMIT 5;
+
+-- Bottom 5 TF-IDF document-term pairs:
+SELECT doc_id, term, tfidf FROM tfidf ORDER BY tfidf ASC LIMIT 5;
