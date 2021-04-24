@@ -3,20 +3,20 @@ CREATE EXTERNAL TABLE IF NOT EXISTS doc_size (
     doc_id string,
     term_count int)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-STORED AS TEXTFILE LOCATION '/textcorpora-doc-size';
+STORED AS TEXTFILE LOCATION '/data-output/2-term-count-document';
 
 CREATE EXTERNAL TABLE IF NOT EXISTS doc_term_count (
     doc_id string,
     term string,
     term_count int)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-STORED AS TEXTFILE LOCATION '/textcorpora-doc-term-count';
+STORED AS TEXTFILE LOCATION '/data-output/3-split-doc-term';
 
 CREATE EXTERNAL TABLE IF NOT EXISTS term_docs (
     term string,
     doc_count int)
 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-STORED AS TEXTFILE LOCATION '/textcorpora-df';
+STORED AS TEXTFILE LOCATION '/data-output/4-df';
 
 DROP TABLE IF EXISTS tfidf;
 CREATE TABLE tfidf
