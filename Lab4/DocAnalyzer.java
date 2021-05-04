@@ -17,6 +17,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 public class DocAnalyzer {
 
+  private static final String STOPWORDS_FILE = "stopwords.txt";
+
   public static class TokenizerMapper extends Mapper<Object, Text, Text, Text> {
 
     private static final Pattern wordPattern = Pattern.compile("[a-z]+");
@@ -38,6 +40,14 @@ public class DocAnalyzer {
 
     private final HashSet<Srting> stopwords = new HashSet<>();
     private final Text outStats = new Text();
+
+    public TokenCategoryReducer() {
+      try (final BufferedReader reader = new BufferedReader(new FileReader(STOPWORDS_FILE))) {
+        for (String line : reader) {
+          stopwords.add(line.trim().toLowerCase());
+        }
+      }
+    }
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       int countTokens = 0;
@@ -84,6 +94,8 @@ public class DocAnalyzer {
 
     FileInputFormat.addInputPath(job, new Path(args[0]));
     FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+    job.addResource(new Path(STOPWORDS_FILE));
 
     System.exit(job.waitForCompletion(true) ? 0 : 1);
   }
