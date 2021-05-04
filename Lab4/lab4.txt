@@ -1,0 +1,47 @@
+CPSC5330 -- Spring 2021
+Lab 4
+
+================================================
+1. Document processing using EMR
+
+This lab will synthesize the Java Hadoop Wordcount program we wrote in Week1 with
+document processing similar to what you did in the TF-IDF exercise in Lab3.
+
+Your solution will use regular (non-streaming) Hadoop, and will run on EMR.
+
+Your single MapReduce job will start with the document corpus,  stored in S3 here:
+s3://cpsc5330s21/data-input/textcorpora/
+
+The main change over simple WordCount for this exercise is to introduce the
+idea of "stop words" -- these are common words like 'the' 'a' 'an' that in
+search contexts are often omitted from document indexed because they tend to
+take up space and not make search retrieval any better.   The file stopwords.txt
+gives you a standard list of stopwords.  
+
+Your output will be one record per document, tab separated, with these fields
+1.  Document ID -- same as previous lab.  For example, 'austen-persuasion'
+2.  The total number of tokens in the document, including stopwords. Token is defined same as previous lab:
+       whitespace delimited, all characters except letters removed, all letters lower cased.
+3.  The number of stopword tokens in the document.
+4.  Of the non-stopword tokens
+      a.  How many terms (unique tokens) are there
+      a.  What is average token length
+      b.  What is the longest token
+
+Here is an example output record:
+burgess-busterbrown	15864	10394	1234	5.41901269274	selfrespecting
+
+A ZIP archive containing	
+(1) A PDF file with
+  (a) Your name
+  (b) How much time did you spend on the lab
+  (c) What were the challenging / difficult parts of the lab
+  (d) The output (retrieved from S3) of your MapReduce run
+
+(2) A file DocAnalyzer.java with the source code for your solution
+
+Extra credit -- up to 5 points added.  Notice some of longest tokens are obviously
+a concatenation of several "real" words.  Figure out what's going on, and fix it.
+If you do the extra credit, note in your PDF writeup that you did the extra credit,
+include in the document the change to the code you made, and give several "before and
+after" examples of documents whose longest token improved.
