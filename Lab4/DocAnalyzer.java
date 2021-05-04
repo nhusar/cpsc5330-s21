@@ -1,5 +1,7 @@
 import java.io.IOException;
-import java.lang.Math;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,12 +40,12 @@ public class DocAnalyzer {
 
   public static class TokenCategoryReducer extends Reducer<Text, Text, Text, Text> {
 
-    private final HashSet<Srting> stopwords = new HashSet<>();
+    private final HashSet<String> stopwords = new HashSet<>();
     private final Text outStats = new Text();
 
-    public TokenCategoryReducer() {
+    public TokenCategoryReducer() throws IOException {
       try (final BufferedReader reader = new BufferedReader(new FileReader(STOPWORDS_FILE))) {
-        for (String line : reader) {
+        for (String line; (line = reader.readLine()) != null; ) {
           stopwords.add(line.trim().toLowerCase());
         }
       }
@@ -78,7 +80,9 @@ public class DocAnalyzer {
   }
 
   public static void main(String[] args) throws Exception {
+
     Configuration conf = new Configuration();
+    conf.addResource(new Path(STOPWORDS_FILE));
 
     Job job = Job.getInstance(conf, "DocAnalyzer");
 
@@ -94,8 +98,6 @@ public class DocAnalyzer {
 
     FileInputFormat.addInputPath(job, new Path(args[0]));
     FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-    job.addResource(new Path(STOPWORDS_FILE));
 
     System.exit(job.waitForCompletion(true) ? 0 : 1);
   }
