@@ -1,0 +1,205 @@
+CPSC 5330 Spring 2021
+Notes, Demo, Week 6, May 4
+
+End-to-End TFIDF
+
+==============
+Where We Are
+
+Can compute TFIDF(doc_id, term) using a sequence of MapReduce and Hive jobs.
+Can run MapReduce on AWS, reading from and writing to S3.
+ 
+At least in theory we could duplicate the TFIDF calculation in EMR.
+(Though it would be tedious doing it from the console.  Look briefly at the EMR create cluster CLI, 
+then also at Step Functions.) 
+
+In order to compute "search relevance" we need to access TFIDF keyed by term, so S3 will not work.
+
+In this session we will continue exploring AWS with the idea of completely reconstructing the document 
+search example on AWS.  So we will have EMR jobs to do the indexing followed by putting computed 
+TFIDF results in Cassandra/DynamoDB, followed by some kind of application to return query results.
+
+We will use the following example:
+
+=================
+EXAMPLE
+
+The education department maintains a large database of data about colleges and universities.
+For this exercise we will use a small data set, in college_data.csv -- the data dictionary 
+is in college_data_dictionary.txt
+
+You will build a system that will culminate in a query asking for all colleges in a state, 
+and provide a cost threshold, and the system will print all colleges in that state with 
+cost below the threshold, ordered by cost. 
+
+You will only store the following information about each college
+-- state (this is your partition key)
+-- cost (this is your sort key)
+-- name
+-- city
+
+1.  Create your DynamoDB table.  (Use state as the partition key and cost as the sort key.)
+2.  Upload the data file to an S3 bucket
+3.  Write Python code to read from the college data file and populate the DynamoDB table.	  
+4.  Write a Python program that will prompt for a state name and a cost threshold,
+    and will print a list of the colleges in that state under the threshold, in ascending
+	order of cost.  (Hint:  since cost is your sort key, you get the costs in ascending order).
+	For each college, print the name, state, city, and cost.
+
+==============
+Explore DynamoDB on the AWS Console
+Goals:
+   * Learn the parameters and methods required for 
+     creating a table and getting and putting items in the table
+   * Create a table, get and put an item in the table 
+        using the console
+
+1.  Look at DynamoDB console on AWS page
+2.  Understand how AWS charges for DynamoDB -- read Units and
+       Write Units -- you can 
+       get more performance by increasing RU and/or WU, 
+       but be careful to set them back because you get charged
+       for capacity whether you are using it or not.  
+
+Read this for understanding provisioned throughput charging.  https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/ProvisionedThroughput.html
+
+
+1. Create the DynamoDB table for our application
+
+  -- Create table -- give it any name you want, like 'college'
+    -- partition key:  for our search application we will be
+          retrieving by 'state'
+    -- sort key:  this allows retrieval by ranges or value within
+          a partition key.  For us that will be 'cost'
+    -- other fields:  name and city
+
+3.  Once the table is created, use the GUI to add an item and query an item.  We will eventually want to 
+do the adding and querying from a Python program but for now the GUI is good for understanding the concepts.
+
+4.  In the GUI, look at other parameters for the table, like scaling / capacity.  That gives us an idea of 
+what choices we might make if we were to use the table in production
+
+Moving to EC2 Instance + CLI
+============================================
+CREATING an EC2 Instance
+
+For both the indexing and query applications, it is best if we provision an EC2 instance -- that will give us a uniform platform, https://aws.amazon.com/ec2/
+
+1.  Create a key pair.  Options for Windows (Putty) or Linux.    For Windows/Ubuntu, remember
+we can't change permissions in the Windows filesystem /mnt/ ....   So have to move the PEM file 
+to ~/.ssh  and then CHMOD it.
+
+2.  Go to the EC2 Console page and select Create Instance, and it will ask you for both AMI and instance type
+For this class we will use
+   * AMI Type: Use the first choice Amazon AMI;  it has aws cli and right version of Python.   
+   * Instance type:  t2.micro
+
+3.  Launch the instance
+   Mandatory to give the instance a name that identifies you
+  
+4.  SSH to the instance
+
+5.  Now that we can SSH to the instance and have a shell, the next step is to get CLI (Amazon command line interface) 
+access to S3 and DynamoDB.
+Read documentation on AWS CLI: https://aws.amazon.com/cli/
+
+6.  Install emacs or editor of choice
+
+7.  The CLI needs to be configured with security tokens 
+associated with your  account.  
+Read this material on configuring the CLI https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+
+
+8.  You need to find your security credentials (Access Key and Secret Access Key).  This was sent to 
+you in email.
+
+aws configure
+
+After finishing the configuration, verify you have access to AWS by trying these commands:
+  * aws s3 ls
+  * aws dynamodb list-tables
+ 
+The latter command should show the dynamoDB table you just created.
+Try aws dynamodb help and aws s3 help.
+
+=============================
+Next get boto3
+
+For reference, consult the boto3 documentation:  https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
+
+curl -O https://bootstrap.pypa.io/get-pip.py
+python3 get-pip.py --user
+pip install boto3
+
+Here is code to populate the table.
+
+import boto3
+from smart_open import open
+from decimal import Decimal
+
+def put_records(s3_filename = 's3://cpsc5330s21/data-input/college_data.csv'):
+    res = boto3.resource('dynamodb')
+    table = res.Table('HanksCollege')
+    with open(s3_filename, 'rb') as fin:
+        i = 1
+        for line in fin:
+            strvalue = line.decode('utf-8').strip()
+            fields = strvalue.split(',')
+            table.put_item(Item={ 'state': fields[3], 'cost': Decimal(fields[6]), 'name': fields[1], 'city': fields[2]})
+            if (i % 100) == 0:
+                print(f"I {i}")
+            i += 1
+			
+Now go to the console to see items are there, and do a query.
+
+Next try to retrieve using boto:
+
+response = table.query(KeyConditionExpression=Key('state').eq('CT') & Key('cost').lt(8000))
+
+for item in response['Items']:
+    print(f"{item['city'], int(item['cost']), item['name']}")
+	
+And then package it up into a query loop.
+
+===============================
+Full code below:
+
+#!/usr/bin/python3
+import boto3
+from smart_open import open
+from decimal import Decimal
+
+def put_records(s3_filename = 's3://cpsc5330s21/data-input/college_data.csv'):
+    res = boto3.resource('dynamodb')
+    table = res.Table('HanksCollege')
+    with open(s3_filename, 'rb') as fin:
+        i = 1
+        for line in fin:
+            strvalue = line.decode('utf-8').strip()
+            fields = strvalue.split(',')
+            table.put_item(Item={ 'state': fields[3], 'cost': Decimal(fields[6]), 'name': fields[1], 'city': fields[2]})
+            if (i % 100) == 0:
+                print(f"I {i}")
+            i += 1
+
+def get_items(state, cost_threshold):
+    response = table.query(KeyConditionExpression=Key('state').eq(state) & Key('cost').lt(cost_threshold))
+    return response['Items']
+
+def process_query():
+    print("Enter state and cost threshold", end=": ")
+    line = input()
+    if len(line.split()) < 2:
+        return None
+    state, cost = line.split()
+    return get_items(state, int(cost))
+
+def query_loop():
+    while True:
+        response = process_query()
+        if response == None:
+            return
+        for item in response:
+            print(f"{item['name']} {item['city']} {item['cost']}")
+
+

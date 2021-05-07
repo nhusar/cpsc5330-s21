@@ -1,0 +1,48 @@
+CPSC5330 -- Big Data Analytics
+
+For this lab you will build your "search engine" that uses the TFIDF data produced by the 
+document ingestion phase.
+
+The application will be a Python program that implements a query/response loop with the 
+user, prompting for a query string.   Upon receiving the query string, the application
+computes the "relevance" of each document to the query string.  Relevance is defined in 
+the document Lab5TFIDF.pdf.
+
+The application prints the docID and the relevance score for the five most relevant documents,
+or less than five if there fewer than five that have non-zero relevance.
+
+The TFIDF values have been pre-loaded into a DynamoDB table HanksTFIDF.  Your application must
+use this table.
+
+Sample output below.
+
+Submit:
+  1.  A Zip archive file containing two files
+     a.  The source code for your application
+     b.  A PDF file with
+        (a) Your name
+        (b) How much time did you spend on the lab
+        (c) What were the challenging / difficult parts of the lab
+        (d) A transcript of your application run on the following queries
+             -- Take a whale to lunch this week!
+             -- What would Jesus do about that?
+             -- My name is Buster.  Deal with it.
+             -- Bodice ripper?
+             -- ??!?
+
+===============================
+Sample Output
+
+Query: dating in the age of covid
+1. bible-kjv -- 1236
+2. whitman-leaves -- 1169
+3. melville-moby_dick -- 1037
+4. chesterton-brown -- 977
+5. chesterton-ball -- 959
+
+Query: if my mother is a king whale, what happens if i kill her?
+1. shakespeare-hamlet -- 362
+2. shakespeare-caesar -- 311
+3. austen-sense -- 309
+4. austen-emma -- 304
+5. blake-poems -- 297
