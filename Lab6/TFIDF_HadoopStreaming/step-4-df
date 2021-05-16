@@ -1,0 +1,2 @@
+echo "Step 4 -- TFIDF in hive"
+./hadoop-streaming 4-df /data/textcorpora /data-output/df

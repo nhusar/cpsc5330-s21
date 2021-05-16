@@ -1,0 +1,28 @@
+#!/opt/hive/bin/hive
+DROP TABLE IF EXISTS doc_term_count;
+CREATE EXTERNAL TABLE doc_term_count(doc_id STRING, term STRING, count int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '/data-output/split-doc-term';
+
+DROP TABLE IF EXISTS doc_length;
+CREATE EXTERNAL TABLE doc_length(doc_id STRING, doc_length int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '/data-output/term-count-document';
+
+DROP TABLE IF EXISTS df;
+CREATE EXTERNAL TABLE df(term STRING, df int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '/data-output/df';
+
+DROP TABLE IF EXISTS tfidf;
+CREATE TABLE tfidf
+ROW FORMAT DELIMITED FIELDS TERMINATED by '\t'
+STORED AS TEXTFILE
+LOCATION '/data-output/tfidf'
+AS
+   select doc_term_count.doc_id, doc_term_count.term, 1000000 * (count / doc_length) / df.df as tfidf
+      from doc_term_count, doc_length, df
+         where doc_term_count.doc_id = doc_length.doc_id and doc_term_count.term = df.term;

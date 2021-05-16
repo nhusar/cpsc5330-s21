@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Step 1, term count"
+./hadoop-streaming 1-term-count /data/textcorpora /data-output/1-term-count

@@ -1,0 +1,58 @@
+CPSC5330 -- Big Data Analytics
+Lab 6
+
+No such thing as too much TFIDF!
+
+For this lab you will build your "search engine" that uses the TFIDF data produced by the 
+document ingestion phase.
+
+You will do the ingestion phase only (except for extra credit), and will work on the small
+version of the text corpora that appears in the Lab6 folder.
+
+You will work in a single notebook.  The code in your notebook -- if run from beginning to end -- 
+should display in the last two cells respectively the five records with the highest TFIDF values,
+and the five records with the lowest TFIDF values.
+
+You should leave the output in your notebook so I can look at it, but also make sure that the notebook
+runs successfully if I do clear state and run all.
+
+The repository contains a fully functional version of TFIDF we did in Hadoop streaming.  This is for 
+your guidance and reference only.  Do not try to copy it exactly into the Spark framework, many details
+will be different.  However, its high-level structure (the five steps) should give you ideas about how
+to structure your RDDs -- for example, you could first work on an RDD that produces  ((doc_id, term), count), 
+one that produces (doc_id term_count), one that produces (term, idf), then one that combines those to produce
+((doc_id, term), tfidf).
+ 
+================================================
+Extra Credit!  (max 5 points)
+
+Although we built our search service using the low-latency feature of DynamoDB, search and relevance
+can be done in the Spark context as well.
+
+Write a function relevance(query) that returns a list with the five highest scoring documents.
+Something like this:
+
+relevance('dead KING garden!', tfidf, docs)
+
+[('bible_kjv', 37),
+ ('carroll_alice', 34),
+ ('blake_poems', 17),
+ ('chesterton_brown', 16),
+ ('milton_paradise', 11)]
+
+You must use Spark for this.  For example, you are not allowed to download your entire TFIDF table
+into memory then do the computation using normal Python.
+
+====================================================
+
+Submit:
+  1.  A Zip archive file containing two files
+     a.  A notebook containing your solution both to the regular part of
+         the lab, and to the extra credit if attempted.
+     b.  A PDF file with
+        (a) Your name
+        (b) How much time did you spend on the lab
+        (c) What were the challenging / difficult parts of the lab
+	(d) Did you do the extra credit, and if so, is it fully working?
+        
+

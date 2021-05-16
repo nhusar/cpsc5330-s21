@@ -1,0 +1,2 @@
+echo "Step 3 -- split doc id and term keys"
+./hadoop-streaming 3-split-key /data-output/1-term-count /data-output/split-doc-term
