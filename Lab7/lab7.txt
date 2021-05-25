@@ -1,0 +1,99 @@
+CPSC5330 -- Big Data Analytics
+Lab 7
+
+Well act surprised.
+This week you will implement your IR system using Spark DataFrames.
+You will implement both the indexing phase and the query phase.
+
+== Indexing ==
+
+Write a function indexDocuments(path)
+where path points to the document corpora.
+
+This function returns a DataFrame with this schema:
+
+    StructType(List(StructField(token,StringType,true),
+                    StructField(docid,StringType,true),
+                    StructField(tfidf,DoubleType,true)))
+
+where tfidf will be computed as   
+   tfidf(token, docid) = int(1000000 * (termFrequency(token, document) / numTokens(document)) / docFrequency(token))
+this should be the same formula as in previous implementations.
+
+You must use DataFrames entirely to build this frame -- you may use the wholeTextFiles method to produce an RDD
+with the filenames and documents, but you must immediately make it into a DataFrame and all subsequent operations
+must be on DataFrames
+
+== Query ==
+
+Write a function relevance(query, tfidf)
+where query is a string of query words, and tfidf is a DataFrame produced by your indexDocuments function.
+Its output is a list of length 5 containing the documents with the highest relevance values, in descending order.
+The list is a list of tuples of the form (docid, relevance) 
+
+== Sample Output == 
+
+CAUTION -- don't try to match these exact numbers.  I generated the index using a secret undisclosed set of 
+documents.
+
+textcorporalocation = 's3:// ...... '
+myindex = indexDocuments(textcorporaLocation)
+myindex.persist()
+myindex.show(2)
+
++----------+----------------+-----+
+|      term|           docid|tfidf|
++----------+----------------+-----+
+|abruptness|     austen_emma|    3|
+|abruptness|chesterton_brown|    6|
++----------+----------------+-----+
+
+relevance("buster, whale, king, and alice the rabbit!", myindex)
+
+[('carroll_alice', 24765),
+ ('burgess_busterbrown', 21630),
+ ('bible_kjv', 14963),
+ ('whitman_leaves', 12620),
+ ('blake_poems', 11559)]
+
+== Contents of Notebook ==
+
+Your notebook should contain
+  -- the definitions of your functions indexDocuments and relevance
+  -- a cell with these lines
+ 
+      textcorporalocation = 's3:// ...... '
+      myindex = indexDocuments(textcorporaLocation)
+      myindex.persist()
+      myindex.show(2)
+
+    (I will change the binding for textcorporalocation.)
+
+  -- a cell with these lines
+
+for query in ["buster, whale, king, and alice the rabbit!",
+               "Take a whale to lunch this week!",
+              "What would Jesus do about that?",
+              "My name is Buster.  Deal with it.",
+              "Bodice ripper?",
+              "What are leaves of grass anyway?",
+              "??!?"]:
+  print(query)
+  print(relevance(query, mytfidf))
+
+Your notebook should have the output from the print statements, but also make sure the
+notebook will run successfully if I do "Restart Kernel and Run All" on it.
+
+====================================================
+
+Submit:
+  1.  A Zip archive file containing two files
+     a.  A notebook containing your solution both to the regular part of
+         the lab, and to the extra credit if attempted.
+     b.  A PDF file with
+        (a) Your name
+        (b) How much time did you spend on the lab
+        (c) What were the challenging / difficult parts of the lab
+
+        
+
