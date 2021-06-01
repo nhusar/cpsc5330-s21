@@ -1,0 +1,16 @@
+CPSC5330 -- Big Data Analytics
+Lab 8 -- Spark Streaming
+
+Most/all instructions for the lab are in Lab8.ipynb
+====================================================
+
+Submit:
+  1.  A Zip archive file containing two files
+     a.  The notebook Lab8.ipynb with your solution
+     b.  A PDF file with
+        (a) Your name
+        (b) How much time did you spend on the lab
+        (c) What were the challenging / difficult parts of the lab
+
+        
+
